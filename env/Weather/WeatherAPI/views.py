@@ -1,7 +1,9 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
-from rest_framework import permissions
-from .serializers import UserSerializer, GroupSerializer
+from rest_framework import permissions, response, status
+from rest_framework.views import APIView
+from .serializers import UserSerializer, GroupSerializer, GetLocationSerializer, PostLocationSerializer
+from .models import Location
 # Create your views here.
 
 
@@ -20,3 +22,59 @@ class GroupViewSet(viewsets.ModelViewSet):
     """
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
+
+class ReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.method in permissions.SAFE_METHODS
+
+class GetAllLocationAPIView(APIView):
+
+    permission_classes = [ReadOnly]
+
+    def get(self, request):
+        try:
+            id = request.query_params["id"]
+            if id != None:
+                location = Location.objects.get(id=id)
+                data = GetLocationSerializer(location)
+        except Location.DoesNotExist:
+            return response.Response(status=status.HTTP_404_NOT_FOUND)
+        except:
+            locations = Location.objects.all()
+            data = GetLocationSerializer(locations, many=True)
+        return response.Response(data=data.data, status=status.HTTP_200_OK)
+
+
+
+
+    
+class AddLocationAPIView(APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def post(self, request):
+        data = PostLocationSerializer(data=request.data)
+        if not data.is_valid():
+            return response.Response(status=status.HTTP_400_BAD_REQUEST)
+        location = Location.objects.create(country=data.data['country'], city=data.data['city'])
+        return response.Response(data=GetLocationSerializer(location, many=False).data, status=status.HTTP_201_CREATED)
+    
+class UpdateLocationAPIView(APIView):
+    permission_classes = [permissions.IsAdminUser]
+    def put(self, request):
+        location = Location.objects.get(id=request.query_params["id"])
+        data = PostLocationSerializer(data=request.data)
+        if not data.is_valid():
+            return response.Response(status=status.HTTP_400_BAD_REQUEST)
+        location.city = data.data['city']
+        location.country = data.data['country']
+        location.save()
+        return response.Response(data=GetLocationSerializer(location, many=False).data, status=status.HTTP_202_ACCEPTED)
+
+class DeleteLocationAPIView(APIView):
+    permission_classes = [permissions.IsAdminUser]
+    def delete(self, request):
+        location = Location.objects.get(id=request.query_params["id"])
+        location.delete()
+        return response.Response(status=status.HTTP_204_NO_CONTENT)
+
+
