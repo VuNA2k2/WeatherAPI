@@ -4,6 +4,7 @@ from django.urls import include, path
 from django.contrib import admin
 from rest_framework import routers
 from . import views
+from weatherAPI.views import GetAllWeatherAPI
 
 
 # Wire up our API using automatic URL routing.
@@ -14,5 +15,6 @@ urlpatterns = [
     path('api/update_location/', views.UpdateLocationAPIView.as_view()),
     path('api/delete_location/', views.DeleteLocationAPIView.as_view()),
     path('admin/', admin.site.urls)
+    path('weatherapp/', GetAllWeatherAPI.as_view()),
     # path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
