@@ -4,18 +4,6 @@ from rest_framework import serializers
 from .models import Location
 from .models import WeatherAPI
 
-class GetAllWeattherAPISerializer(serializers.ModelSerializer):
-    class Meta:
-        model=WeatherAPI
-        fields=('Temperature','Windspeed','TrangThai','Id','LocationId','Date')
-
-class WeatherAPISerializer(serializers.Serializer):
-    Temperature1=serializers.IntegerField()
-    Windspeed1=serializers.IntegerField()
-    TrangThai1=serializers.CharField(max_length=12)
-    Id1=serializers.IntegerField()
-    LocationId1=serializers.IntegerField()
-    Date1=serializers.CharField(max_length=12)
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -37,3 +25,13 @@ class PostLocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = ['country', 'city']
+
+class GetWeatherAPISerializer(serializers.ModelSerializer):
+    class Meta:
+        model=WeatherAPI
+        fields=('temperature','wind_speed','trang_thai','id','location_id','date')
+
+class PostWeatherAPISerializer(serializers.ModelSerializer):
+    class Meta:
+        model=WeatherAPI
+        fields=('temperature','wind_speed','trang_thai','location_id','date')

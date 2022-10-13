@@ -3,33 +3,9 @@ from rest_framework import viewsets
 from rest_framework import permissions, response, status
 from rest_framework.views import APIView
 from .serializers import UserSerializer, GroupSerializer, GetLocationSerializer, PostLocationSerializer
-
+from .serializers import GetWeatherAPISerializer, PostWeatherAPISerializer
 from .models import Location
-from django.shortcuts import render
-from rest_framework.response import Response
 from .models import WeatherAPI
-from .serializers import GetAllWeattherAPISerializer, WeatherAPISerializer
-
-# Create your views here.
-class GetAllWeatherAPI(APIView):
-    def get(self, request):
-        list_weather=WeatherAPI.objects.all()
-        mydata=GetAllWeattherAPISerializer(list_weather, many=True)
-        return Response(data=mydata.data,status=status.HTTP_200_OK)
-    
-    def post(self, request):
-        mydata=WeatherAPISerializer(data=request.data)
-        if  not mydata.is_valid():
-            return Response('Sai du lieu',status=status.HTTP_400_BAD_REQUEST)
-        Temperature=mydata.data['Temperature1']
-        Windspeed=mydata.data['Windspeed1']
-        TrangThai=mydata.data['TrangThai1']
-        Id=mydata.data['Id1']
-        LocationId=mydata.data['LocationId1']
-        Date=mydata.data['Date1']
-        wt=WeatherAPI.objects.create(Temperature=Temperature,Windspeed=Windspeed,
-        TrangThai=TrangThai,Id=Id,LocationId=LocationId,Date=Date)
-        return Response(data=wt.id,status=status.HTTP_200_OK)
 
 # class UserViewSet(viewsets.ModelViewSet):
 #     """
@@ -67,9 +43,6 @@ class GetAllLocationAPIView(APIView):
             locations = Location.objects.all()
             data = GetLocationSerializer(locations, many=True)
         return response.Response(data=data.data, status=status.HTTP_200_OK)
-
-
-
 
     
 class AddLocationAPIView(APIView):
@@ -141,3 +114,36 @@ class DeleteLocationAPIView(APIView):
             return response.Response(status=status.HTTP_404_NOT_FOUND)
 
 
+class GetAllWeatherAPIView(APIView):
+    permission_classes = [ReadOnly]
+    def get(self, request):
+        try:
+            id = request.query_params["id"]
+            if id != None:
+                weather = WeatherAPI.objects.get(id=id)
+                data = GetWeatherAPISerializer(weather)
+        except WeatherAPI.DoesNotExist:
+            return response.Response(status=status.HTTP_404_NOT_FOUND)
+        except:
+            list_weather=WeatherAPI.objects.all()
+            data=GetWeatherAPISerializer(list_weather, many=True)
+        return response.Response(data=data.data, status=status.HTTP_200_OK)
+
+class AddWeatherAPIView(APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def post(self, request):
+        data=PostWeatherAPISerializer(data=request.data)
+        if  not data.is_valid():
+            return response.Response(status=status.HTTP_400_BAD_REQUEST)
+        temperature=data.data['temperature']
+        wind_speed=data.data['wind_speed']
+        trang_thai=data.data['trang_thai']
+        location_id=data.data['location_id']
+        date=data.data['date']
+        wt=WeatherAPI.objects.create(temperature=temperature,wind_speed=wind_speed,
+        trang_thai=trang_thai, location_id=location_id, date=date)
+        return response.Response(data=GetWeatherAPISerializer(wt, many=False).data,status=status.HTTP_200_OK)
+        # weather = WeatherAPI.objects.create(temperature=data.data['temperature'], wind_speed=data.data['wind_speed'],
+        # trang_thai=data.data['trang_thai'], location_id=data.data['location_id'], date=data.data['date'])
+        # return response.Response(data=GetWeatherAPISerializer(weather, many=False).data, status=status.HTTP_201_CREATED)
