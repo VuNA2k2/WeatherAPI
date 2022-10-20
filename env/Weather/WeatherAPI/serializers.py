@@ -1,21 +1,7 @@
 from dataclasses import fields
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
-from .models import Location
-from .models import WeatherAPI
-
-class GetAllWeattherAPISerializer(serializers.ModelSerializer):
-    class Meta:
-        model=WeatherAPI
-        fields=('Temperature','Windspeed','TrangThai','Id','LocationId','Date')
-
-class WeatherAPISerializer(serializers.Serializer):
-    Temperature1=serializers.IntegerField()
-    Windspeed1=serializers.IntegerField()
-    TrangThai1=serializers.CharField(max_length=12)
-    Id1=serializers.IntegerField()
-    LocationId1=serializers.IntegerField()
-    Date1=serializers.CharField(max_length=12)
+from .models import Location, Weather
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -37,3 +23,12 @@ class PostLocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = ['country', 'city']
+class GetWeatherSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Weather
+        fields=('temperature','wind_speed','status','id','location_id','date')
+
+class PostWeatherSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Weather
+        fields=('temperature','wind_speed','status','location_id','date')
