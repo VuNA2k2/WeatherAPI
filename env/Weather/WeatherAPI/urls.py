@@ -15,6 +15,7 @@ urlpatterns = [
     path('api/user/login', TokenObtainPairView.as_view(), name='login'),
     path('api/user/register/', views.RegisterUserAPIView.as_view(), name='register'),
     path('api/user/edit_user/', views.EditUserAPIView.as_view(), name='edit'),
+    path('api/user/delete_user/', views.DeleteUserAPIView.as_view(), name='delete'),
     path('api/location/get_location/', views.GetAllLocationAPIView.as_view()),
     path('api/location/add_location/', views.AddLocationAPIView.as_view()),
     path('api/location/update_location/', views.UpdateLocationAPIView.as_view()),
@@ -25,6 +26,7 @@ urlpatterns = [
     path('api/weather/update_weather/', views.UpdateWeatherAPIView.as_view()),
     path('api/weather/delete_weather/', views.DeleteWeatherAPIView.as_view()),
     path('api/weather/get_weather_by_date/', views.GetByDateWeatherAPIView.as_view()),
+    path('api/weather/get_weather_by_location_id/', views.GetByLocationWeatherAPIView.as_view()),
     path('admin/', admin.site.urls),
     # path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]

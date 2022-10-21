@@ -199,6 +199,17 @@ class GetByDateWeatherAPIView(APIView):
             return response.Response(data=GetWeatherSerializer(weather, many=True).data, status=st.HTTP_200_OK)
         return response.Response(status=st.HTTP_400_BAD_REQUEST)
 
+class GetByLocationWeatherAPIView(APIView):
+    @swagger_auto_schema(
+        responses={200: openapi.Response('ok', GetWeatherSerializer)},
+        manual_parameters=[openapi.Parameter('location id', openapi.IN_QUERY, description="Get weather by location", type=openapi.TYPE_STRING)],)
+    def get(self, request):
+        location_id = request.query_params['location_id']
+        if location_id != None:
+            weather = Weather.objects.order_by('date').filter(location_id=location_id)
+            return response.Response(data=GetWeatherSerializer(weather, many=True).data, status=st.HTTP_200_OK)
+        return response.Response(status=st.HTTP_400_BAD_REQUEST)
+
 
 class RegisterUserAPIView(APIView):
     permission_classes = (permissions.IsAdminUser,)
@@ -240,3 +251,16 @@ class EditUserAPIView(APIView):
             return response.Response(status=st.HTTP_404_NOT_FOUND)
         except:
             return response.Response(status=st.HTTP_400_BAD_REQUEST)
+
+class DeleteUserAPIView(APIView):
+    permission_classes = (permissions.IsAdminUser,)
+    @swagger_auto_schema(
+        responses={204: openapi.Response('delete')},
+        manual_parameters=[openapi.Parameter('username', openapi.IN_QUERY, description="Delete user by username from admin", type=openapi.TYPE_STRING)],)
+    def delete(self, request):
+        username = request.query_params['username']
+        if id != None:
+            user = User.objects.get(username=username)
+            user.delete()
+            return response.Response(status=st.HTTP_204_NO_CONTENT)
+        return response.Response(status=st.HTTP_400_BAD_REQUEST)
