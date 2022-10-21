@@ -3,16 +3,20 @@ from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from .models import Location, Weather
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['url', 'username', 'email', 'groups']
+        fields = ('id', 'username', 'password', 'email', 'first_name', 'last_name')
+        write_only_fields = ('password',)
+        read_only_fields = ('id',)
 
-
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
+class EditUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Group
-        fields = ['url', 'name']
+        model = User
+        fields = ('id', 'username', 'password', 'email', 'first_name', 'last_name')
+        write_only_fields = ('password',)
+        read_only_fields = ('id', 'username')
+
 
 class GetLocationSerializer(serializers.ModelSerializer):
     class Meta:
