@@ -25,8 +25,9 @@ urlpatterns = [
     path('api/weather/add_weather/', views.AddWeatherAPIView.as_view()),
     path('api/weather/update_weather/', views.UpdateWeatherAPIView.as_view()),
     path('api/weather/delete_weather/', views.DeleteWeatherAPIView.as_view()),
-    path('api/weather/get_weather_by_date/', views.GetByDateWeatherAPIView.as_view()),
-    path('api/weather/get_weather_by_location_id/', views.GetByLocationWeatherAPIView.as_view()),
+    path('api/weather/get_weather_by_date/', views.GetWeatherByDateAPIView.as_view()),
+    path('api/weather/get_weather_by_location_id/', views.GetWeatherByLocationAPIView.as_view()),
+    path('api/weather/get_weather_by_location_at_date/', views.GetWeatherByLocationAtDateAPIView.as_view()),
     path('admin/', admin.site.urls),
     # path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
