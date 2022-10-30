@@ -1,3 +1,5 @@
+import datetime
+import json
 from os import stat
 from django.contrib.auth.models import User
 from rest_framework import generics, filters
@@ -235,6 +237,37 @@ class GetWeatherByLocationAtDateAPIView(APIView):
                 return response.Response(status=st.HTTP_400_BAD_REQUEST)
         except:
             return response.Response(status=st.HTTP_400_BAD_REQUEST)
+        
+class GetWeatherByLocationInOneWeekAPIView(APIView):
+    @swagger_auto_schema(
+        responses={200: openapi.Response('ok', GetWeatherSerializer)},
+        manual_parameters=[openapi.Parameter('location_id', openapi.IN_QUERY, description="Get weather by location", type=openapi.TYPE_STRING),
+                           openapi.Parameter('date', openapi.IN_QUERY, description="Get weather by date", type=openapi.TYPE_STRING)],)
+    def get(self, request):
+        try:
+            location_id = request.query_params['location_id']
+            input_date = request.query_params['date']
+            current_date = datetime.datetime.strptime(input_date, '%Y-%m-%d').date()
+            future_date_list = []
+            for i in range(7):
+                future_date_list.append(current_date + datetime.timedelta(days=i))
+            str_date_list = []
+            for i in future_date_list:
+                str_date_list.append(i.strftime('%Y-%m-%d'))
+            weather_list = []
+            for i in range(7):
+                if location_id != None and str_date_list[i] != None:
+                    weather = Weather.objects.filter(
+                        location_id=location_id,
+                        date = str_date_list[i],
+                    )
+                    weather_list.append(weather)
+            data=GetWeatherSerializer(weather_list, many=True) 
+            return response.Response(data=data.data, status=st.HTTP_200_OK)   
+        except:
+            return response.Response(status=st.HTTP_400_BAD_REQUEST)
+        
+        
 
 
 class RegisterUserAPIView(APIView):
@@ -293,3 +326,4 @@ class DeleteUserAPIView(APIView):
             user.delete()
             return response.Response(status=st.HTTP_204_NO_CONTENT)
         return response.Response(status=st.HTTP_400_BAD_REQUEST)
+    

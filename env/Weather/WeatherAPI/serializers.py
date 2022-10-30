@@ -1,7 +1,7 @@
 from dataclasses import fields
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
-from .models import Location, Weather
+from .models import Location, Weather, Weather_List
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -39,6 +39,8 @@ class GetWeatherSerializer(serializers.ModelSerializer):
         model = Weather
         fields = ('temperature', 'wind_speed', 'status',
                   'id', 'location_id', 'date', 'humidity')
+        
+
 
 
 class PostWeatherSerializer(serializers.ModelSerializer):
